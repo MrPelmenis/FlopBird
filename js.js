@@ -25,15 +25,15 @@ class Bird {
 
     move() {
         if (this.fallOrFly) {
-            this.ySpeed -= 1.5;
+            this.ySpeed -= 0.3;
         } else {
-            this.ySpeed += 1.5;
+            this.ySpeed += 0.3;
         }
         this.y += this.ySpeed;
 
         setTimeout(() => {
             this.move();
-        }, 50);
+        }, 20);
     }
 
     get y() {
@@ -48,10 +48,11 @@ class Bird {
 }
 
 function drawBird() {
-
+    ctx.fillRect(bird.x, bird.y, 40, 40)
 }
 
 function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBird();
     drawWalls();
     window.requestAnimationFrame(draw);
@@ -61,43 +62,43 @@ function drawWalls() {
     walls.walls.forEach(wall => {
         ctx.beginPath();
         ctx.moveTo(wall.x, 0);
-        ctx.lineTo(wall.x, wall.y - 10);
-        ctx.moveTo(wall.x, wall.y + 10);
+        ctx.lineTo(wall.x, wall.y - 50);
+        ctx.moveTo(wall.x, wall.y + 50);
         ctx.lineTo(wall.x, canvas.height);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 10;
+        ctx.stroke();
     })
 }
 
 class Walls {
-
     constructor() {
-        this.func = this.generateFunction();
-        this.x = 0;
+        this.x = Math.floor(Math.random() * 1111);
         this.speed = 10;
         this.walls = [];
         this.moveWalls();
+        this.generateWall();
     }
 
     generateWall() {
-        let tempFunc;
-        while (tempFunc.indexOf("x") != -1) {
-            tempFunc.replace("x", `${this.x}`);
-        }
-        let currentY = eval(tempFunc);
+        let currentY = this.calculateY();
         this.walls.push({ x: screen.width * 1.1, y: currentY });
+        setTimeout(() => {
+            this.generateWall();
+        }, 2000);
+    }
+
+    calculateY() {
+        return (50 * (Math.sin(3 * this.x) - 2 * Math.cos(this.x) + 2 * Math.sin(3 * this.x) - 3 * Math.sin(3 * this.x) + 3 * Math.sin(2 * this.x) - 3 * Math.sin(this.x / 2) + 1.6 * Math.sin(this.x))) + 500;
     }
 
     moveWalls() {
         this.walls.forEach((wall) => {
             wall.x--;
         });
-
+        this.x--;
         setTimeout(() => {
             this.moveWalls();
-        }, timeout);
+        }, 1);
     }
-
-    generateFunction() {
-        return "192*(sin(2.1x) - 2cos(0.21x) + 2sin(3x)- 3sin(3x)+ 3sin(1.7x)- 3sin(0.5x)+ 1.1sin(0.8x))";
-    }
-
 }
